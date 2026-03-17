@@ -17,13 +17,26 @@ class IronBack:
         start_reponse("404 Not found",[])
         return [b"Not Found"]
 
+    def route_method(self, path, handler, method_name):
+        path_name = path or f"/{handler.__name__}"
+
+        if path_name not in self.routes:
+            self.routes[path_name] = {}
+
+        self.routes[path_name][method_name] = handler
+
+
     def get(self, path=None):
         def wrapper(handler):
-            path_name = path or f"/{handler.__name__}"
+            return self.route_method(path, handler, "GET")
+        return wrapper
 
-            if path_name not in self.routes:
-                self.routes[path_name] = {}
+    def post(self, path=None):
+        def wrapper(handler):
+            return self.route_method(path, handler, "POST")
+        return wrapper
 
-            self.routes[path_name]["GET"] = handler
-
+    def delete(self, path=None):
+        def wrapper(handler):
+            return self.route_method(path, handler, "DELETE")
         return wrapper
