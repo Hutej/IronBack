@@ -25,7 +25,6 @@ class IronBack:
 
         self.routes[path_name][method_name] = handler
 
-
     def get(self, path=None):
         def wrapper(handler):
             return self.route_method(path, handler, "GET")

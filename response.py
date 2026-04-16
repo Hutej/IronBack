@@ -16,4 +16,10 @@ class Response:
             self.text = text
         else:
             self.text = str(text)
-        self.status_code = status_code
+        
+        if isinstance(status_code, int):
+            self.status_code = str(status_code)
+        elif isinstance(status_code, str):
+            self.status_code = status_code
+        else:
+            raise ValueError("Status code has to be either int or string")
