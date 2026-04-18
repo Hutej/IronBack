@@ -1,4 +1,5 @@
 from typing import Any
+from parse import parse
 from response import Response
 
 class IronBack:
@@ -8,14 +9,13 @@ class IronBack:
     def __call__(self, environ, start_reponse) -> Any:
         response = Response()
         for path, handle_dict in self.routes.items():
+            res = parse(path, environ["PATH_INFO"])
             for request_method, handler in handle_dict.items():
-                if environ["REQUEST_METHOD"] == request_method and path == environ["PATH_INFO"]:
-                    handler(environ, response)
-                    response.as_wsgi(start_reponse)
-                    return [(response.text).encode()]   
+                if environ["REQUEST_METHOD"] == request_method and res:
+                    handler(environ, response, **res.named)
+                    return response.as_wsgi(start_reponse) 
                 
-        start_reponse("404 Not found",[])
-        return [b"Not Found"]
+        return response.as_wsgi(start_reponse)
 
     def route_method(self, path, handler, method_name):
         path_name = path or f"/{handler.__name__}"
